@@ -39,6 +39,10 @@ jobs:
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mail-automation
           role-duration-seconds: ${{ env.SESSION_DURATION }}
 
+      - name: Download lambda layers
+        run: |
+          ./bin/download_insights_layer.sh
+
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@2fc7aceee09e9e4a7105c0d060c656fad0b4f63d # v1.7.0
         with:
