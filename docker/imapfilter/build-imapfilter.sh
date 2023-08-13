@@ -42,6 +42,7 @@ export PKGTYPE=txz
 
   cd system/jq
 
+  # shellcheck source=/dev/null
   . jq.info
 
   wget "$DOWNLOAD"
@@ -54,6 +55,7 @@ export PKGTYPE=txz
 
   cd development/lua/
 
+  # shellcheck source=/dev/null
   . lua.info
 
   wget "$DOWNLOAD"
@@ -68,6 +70,7 @@ installpkg /tmp/*.txz
 
   cd network/imapfilter
 
+  # shellcheck source=/dev/null
   . imapfilter.info
 
   wget "$DOWNLOAD"
