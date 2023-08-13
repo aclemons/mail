@@ -95,3 +95,23 @@ resource "aws_ssm_parameter" "accounts_data" {
     ignore_changes  = [value]
   }
 }
+
+resource "aws_cloudwatch_event_rule" "cron" {
+  name        = "${local.project_name}-imapfilter-cron"
+  description = "Invokes ${local.project_name}-imapfilter Lambda function every 5 minutes."
+
+  schedule_expression = "cron(*/5 * ? * * *)" # every 5 minutes
+}
+
+resource "aws_cloudwatch_event_target" "imapfilter" {
+  rule = aws_cloudwatch_event_rule.cron.id
+  arn  = aws_lambda_function.imapfilter_lambda.arn
+}
+
+resource "aws_lambda_permission" "imapfilter_eventbridge" {
+  function_name = "${local.project_name}-imapfilter"
+  statement_id  = "EventBridgePermissions"
+  action        = "lambda:InvokeFunction"
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.cron.arn
+}
