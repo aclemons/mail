@@ -75,5 +75,5 @@ jobs:
         working-directory: tf
 
       - name: Terraform apply
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -auto-approve -input=false -var docker_image_version=${{ env.DOCKER_IMAGE_VERSION }}
         working-directory: tf
