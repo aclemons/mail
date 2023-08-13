@@ -29,3 +29,12 @@ repos:
     rev: v1.6.25
     hooks:
       - id: actionlint-docker
+
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.81.2
+    hooks:
+      - id: terraform_fmt
+      - id: terraform_tflint
+        args:
+          - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
+          - --hook-config=--delegate-chdir

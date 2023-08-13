@@ -1,5 +1,5 @@
 locals {
-  project_name  = "mail"
+  project_name = "mail"
 }
 
 resource "aws_ecr_repository" "imapfilter" {
