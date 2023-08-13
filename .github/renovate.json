@@ -15,6 +15,9 @@
       "matchDepNames": "ubuntu gha runner"
     }
   ],
+  "pre-commit": {
+    "enabled": true
+  },
   "regexManagers": [
     {
       "autoReplaceStringTemplate": "ubuntu-{{{newValue}}}.04",
