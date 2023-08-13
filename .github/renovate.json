@@ -29,6 +29,15 @@
       ],
       "packageNameTemplate": "actions/runner-images",
       "versioningTemplate": "loose"
+    },
+    {
+      "fileMatch": [
+        "^docker/imapfilter/build-imapfilter.sh"
+      ],
+      "matchStrings": [
+        "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?_VERSION=\"(?<currentValue>.*)\""
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
     }
   ],
   "separateMajorMinor": true,
