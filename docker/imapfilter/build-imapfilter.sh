@@ -27,14 +27,7 @@ set -o pipefail
 export TERSE=0
 
 slackpkg -default_answer=yes -batch=on update
-
-EXIT_CODE=0
-slackpkg -default_answer=yes -batch=on install make guile gc gcc-11 glibc kernel-headers binutils || EXIT_CODE=$?
-
-if [ $EXIT_CODE -ne 0 ] && [ $EXIT_CODE -ne 20 ] ; then
-  exit $EXIT_CODE
-fi
-
+slackpkg -default_answer=yes -batch=on install make guile gc gcc-11 glibc kernel-headers binutils
 rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/*
 
 # renovate: datasource=github-tags depName=SlackBuildsOrg/slackbuilds versioning=loose
@@ -43,6 +36,19 @@ wget -O - "https://github.com/SlackBuildsOrg/slackbuilds/tarball/$SBO_RELEASE_VE
 
 export TAG=_aclemons
 export PKGTYPE=txz
+
+(
+  cd SlackBuildsOrg-slackbuilds-*
+
+  cd system/jq
+
+  . jq.info
+
+  wget "$DOWNLOAD"
+  printf "%s\t%s\n" "$MD5SUM" "$(basename "$DOWNLOAD")" | md5sum --check --quiet
+  bash jq.SlackBuild
+)
+
 (
   cd SlackBuildsOrg-slackbuilds-*
 

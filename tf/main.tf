@@ -9,10 +9,6 @@ resource "aws_ecr_repository" "imapfilter" {
   image_scanning_configuration {
     scan_on_push = true
   }
-
-  tags = {
-    Project = local.project_name
-  }
 }
 
 data "aws_iam_policy_document" "assume_role" {
@@ -45,10 +41,6 @@ resource "aws_iam_role_policy_attachment" "lambda_insights_execution_role" {
 
 resource "aws_cloudwatch_log_group" "imapfilter_lambda" {
   name = "/aws/lambda/${local.project_name}-imapfilter"
-
-  tags = {
-    Project = local.project_name
-  }
 }
 
 resource "aws_lambda_function" "imapfilter_lambda" {
@@ -60,10 +52,6 @@ resource "aws_lambda_function" "imapfilter_lambda" {
   image_uri    = "${aws_ecr_repository.imapfilter.repository_url}:${var.docker_image_version}"
 
   timeout = 30
-
-  tags = {
-    Project = local.project_name
-  }
 
   depends_on = [
     aws_cloudwatch_log_group.imapfilter_lambda,

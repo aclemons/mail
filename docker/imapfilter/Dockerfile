@@ -20,6 +20,7 @@ FROM slackware-base as base
 
 RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
     slackpkg -default_answer=yes -batch=on install \
+    bison \
     brotli \
     ca-certificates \
     curl \
@@ -27,6 +28,7 @@ RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
     dcron \
     flex \
     nghttp2 \
+    oniguruma \
     perl \
     readline \
     && \
