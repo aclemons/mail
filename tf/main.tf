@@ -69,3 +69,16 @@ resource "aws_lambda_function" "imapfilter_lambda" {
     aws_cloudwatch_log_group.imapfilter_lambda,
   ]
 }
+
+resource "aws_ssm_parameter" "accounts_data" {
+  name        = "/${local.project_name}/imapfilter/accounts"
+  description = "JSON payload of all the account information"
+  type        = "SecureString"
+  tier        = "Intelligent-Tiering"
+  value       = "[]"
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [value]
+  }
+}
