@@ -3,7 +3,7 @@
 set -e
 set -o pipefail
 
-printf 'Starting lambda handler. Running as pid %s\n' "$BASHPID"
+printf 'Starting lambda handler. Running as pid %s, user %s\n' "$BASHPID" "$(id -u)"
 
 shutdown() {
   printf 'Shutting down gracefully\n'
@@ -21,7 +21,7 @@ while true ; do
   printf 'Processing request %s\n' "$REQUEST_ID"
 
   ret=0
-  imapfilter -v || ret=$?
+  imapfilter -v -c /imapfilter/config.lua || ret=$?
 
   if [ $ret -eq 0 ] ; then
     curl -f -sS -X POST "http://$AWS_LAMBDA_RUNTIME_API/2018-06-01/runtime/invocation/$REQUEST_ID/response" -d "{\"result\": 0}"

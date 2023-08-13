@@ -46,4 +46,7 @@ RUN --mount=target=/tmp,source=tmp,from=imapfilter \
 
 COPY docker/imapfilter/entrypoint.sh /entrypoint.sh
 
+WORKDIR /imapfilter
+COPY docker/imapfilter/config.lua /imapfilter/config.lua
+
 ENTRYPOINT ["/entrypoint.sh"]

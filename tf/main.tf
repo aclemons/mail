@@ -59,7 +59,6 @@ resource "aws_lambda_function" "imapfilter_lambda" {
   package_type = "Image"
   image_uri    = "${aws_ecr_repository.imapfilter.repository_url}:${var.docker_image_version}"
 
-
   timeout = 30
 
   tags = {
