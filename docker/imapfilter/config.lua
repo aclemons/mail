@@ -17,3 +17,9 @@ other_account = IMAP {
 }
 results = other_account.INBOX:select_all()
 results:move_messages(main_account['INBOX'])
+
+local junk = os.getenv("OTHER_JUNK")
+if (junk ~= nil and junk ~= '') then
+  results = other_account[junk]:select_all()
+  results:move_messages(main_account['Spam'])
+end

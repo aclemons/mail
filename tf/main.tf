@@ -39,6 +39,31 @@ resource "aws_iam_role_policy_attachment" "lambda_insights_execution_role" {
   role       = aws_iam_role.iam_for_lambda.id
 }
 
+resource "aws_iam_policy" "imapfilter_lambda" {
+  name        = "${local.project_name}-imapfilter-lambda-ssm-policy"
+  description = "Policy to attach to ${local.project_name}-imapfilter lambda."
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+        ]
+        Resource = [
+          "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${local.project_name}*"
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "this" {
+  policy_arn = aws_iam_policy.imapfilter_lambda.arn
+  role       = aws_iam_role.iam_for_lambda.id
+}
+
 resource "aws_cloudwatch_log_group" "imapfilter_lambda" {
   name = "/aws/lambda/${local.project_name}-imapfilter"
 }

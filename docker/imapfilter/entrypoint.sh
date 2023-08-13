@@ -5,6 +5,10 @@ set -o pipefail
 
 printf 'Starting lambda handler. Running as pid %s, user %s\n' "$BASHPID" "$(id -u)"
 
+PARAMETERS_SECRETS_EXTENSION_HTTP_PORT=${PARAMETERS_SECRETS_EXTENSION_HTTP_PORT:-2773}
+
+url="http://localhost:$PARAMETERS_SECRETS_EXTENSION_HTTP_PORT/systemsmanager/parameters/get/?name=/mail/imapfilter/accounts&withDecryption=true"
+
 shutdown() {
   printf 'Shutting down gracefully\n'
   exit
@@ -20,12 +24,16 @@ while true ; do
 
   printf 'Processing request %s\n' "$REQUEST_ID"
 
+  printf 'Fetching accounts from parameters and secrets extension %s\n' "$url"
+  ACCOUNTS="$(curl -f -s -H "X-Aws-Parameters-Secrets-Token: $AWS_SESSION_TOKEN" "$url" | jq '.Parameter | .Value | fromjson')"
+
   ret=0
-  imapfilter -v -c /imapfilter/config.lua || ret=$?
+  ACCOUNTS="$ACCOUNTS" /imapfilter/run.sh || ret=$?
 
   if [ $ret -eq 0 ] ; then
     curl -f -sS -X POST "http://$AWS_LAMBDA_RUNTIME_API/2018-06-01/runtime/invocation/$REQUEST_ID/response" -d "{\"result\": 0}"
   else
+    printf 'run.sh failed\n'
     curl -f -sS -X POST "http://$AWS_LAMBDA_RUNTIME_API/2018-06-01/runtime/invocation/$REQUEST_ID/response" -d "{\"result\": $ret}"
   fi
   rm -rf "$BODY"

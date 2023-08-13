@@ -51,5 +51,6 @@ COPY docker/imapfilter/entrypoint.sh /entrypoint.sh
 
 WORKDIR /imapfilter
 COPY docker/imapfilter/config.lua /imapfilter/config.lua
+COPY docker/imapfilter/run.sh /imapfilter/run.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
