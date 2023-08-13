@@ -11,7 +11,8 @@ RUN --mount=target=/layers,source=docker/shared/layers \
     infozip \
     && \
     rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/* && \
-    unzip -q -d /tmp/layer /layers/lambda-insights-*amd64*.zip && \
+    unzip -q -d /tmp/layer /layers/lambda-insights-amd64-*.zip && \
+    unzip -q -d /tmp/layer /layers/parameters-and-secrets-amd64-*.zip && \
     removepkg infozip
 
 
