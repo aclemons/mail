@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.6.0
 
-FROM aclemons/slackware:15.0@sha256:55c43e5e565e3e8e35761051abec9510b8d581b5b32358170d1bc0e351ee118a as slackware-base
+FROM aclemons/slackware:15.0@sha256:287cad35c44be6bd90855dd056b1e2da78a748716b20f9c0ea75c0bb3ecf4179 as slackware-base
 
 FROM slackware-base as lambda-layers
 
