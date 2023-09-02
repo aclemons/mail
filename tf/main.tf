@@ -11,6 +11,42 @@ resource "aws_ecr_repository" "imapfilter" {
   }
 }
 
+resource "aws_ecr_lifecycle_policy" "imapfilter" {
+  repository = aws_ecr_repository.imapfilter.name
+
+  policy = <<EOF
+{
+    "rules": [
+        {
+            "rulePriority": 1,
+            "description": "Delete untagged images.",
+            "selection": {
+                "tagStatus": "untagged",
+                "countType": "imageCountMoreThan",
+                "countNumber": 1
+            },
+            "action": {
+                "type": "expire"
+            }
+        },
+        {
+            "rulePriority": 2,
+            "description": "Keep that last 2 git sha tagged images (last 2 merges to master).",
+            "selection": {
+                "tagStatus": "tagged",
+                "tagPrefixList": ["git"],
+                "countType": "imageCountMoreThan",
+                "countNumber": 2
+            },
+            "action": {
+                "type": "expire"
+            }
+        }
+    ]
+}
+EOF
+}
+
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
