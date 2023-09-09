@@ -17,6 +17,7 @@
   "rangeStrategy": "pin",
   "regexManagers": [
     {
+      "customType": "regex",
       "fileMatch": [
         "^docker/imapfilter/build-imapfilter.sh"
       ],
