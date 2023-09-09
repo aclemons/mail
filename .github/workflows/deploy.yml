@@ -2,7 +2,7 @@
 
 name: Build and deploy mail infrastructure
 
-"on":
+on:
   push:
     branches: master
 
@@ -31,8 +31,7 @@ jobs:
         uses: docker/setup-buildx-action@885d1462b80bc1c1c7f0b00334ad271f09369c55 # v2.10.0
 
       - name: Compute git sha
-        run:
-          echo "DOCKER_IMAGE_VERSION=git$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+        run: echo "DOCKER_IMAGE_VERSION=git$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@50ac8dd1e1b10d09dac7b8727528b91bed831ac0 # v3.0.2
@@ -65,8 +64,7 @@ jobs:
             ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/mail/imapfilter:${{ env.DOCKER_IMAGE_VERSION }}
 
       - name: Set terraform version
-        run:
-          echo "TERRAFORM_VERSION=$(cat tf/.terraform-version)" >> "$GITHUB_ENV"
+        run: echo "TERRAFORM_VERSION=$(cat tf/.terraform-version)" >> "$GITHUB_ENV"
 
       - uses: hashicorp/setup-terraform@633666f66e0061ca3b725c73b2ec20cd13a8fdd1 # v2.0.3
         with:
