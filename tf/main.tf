@@ -6,6 +6,15 @@ resource "aws_ses_domain_identity" "caffe" {
   domain = "caffe.nz"
 }
 
+resource "aws_ses_domain_dkim" "caffe" {
+  domain = aws_ses_domain_identity.caffe.domain
+}
+
+resource "aws_ses_domain_mail_from" "caffe" {
+  domain           = aws_ses_domain_identity.caffe.domain
+  mail_from_domain = "mail.${aws_ses_domain_identity.caffe.domain}"
+}
+
 resource "aws_ecr_repository" "imapfilter" {
   name                 = "${local.project_name}/imapfilter"
   image_tag_mutability = "MUTABLE"
