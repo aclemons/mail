@@ -2,6 +2,10 @@ locals {
   project_name = "mail"
 }
 
+resource "aws_ses_domain_identity" "caffe" {
+  domain = "caffe.nz"
+}
+
 resource "aws_ecr_repository" "imapfilter" {
   name                 = "${local.project_name}/imapfilter"
   image_tag_mutability = "MUTABLE"
