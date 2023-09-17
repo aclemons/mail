@@ -15,6 +15,31 @@ resource "aws_ses_domain_mail_from" "caffe" {
   mail_from_domain = "mail.${aws_ses_domain_identity.caffe.domain}"
 }
 
+resource "aws_s3_bucket" "caffe_mail" {
+  bucket = "${local.project_name}-caffe"
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "caffe_mail" {
+  bucket = aws_s3_bucket.caffe_mail.id
+
+  rule {
+    bucket_key_enabled = false
+
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "caffe_mail" {
+  bucket = aws_s3_bucket.caffe_mail.id
+
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
 resource "aws_ecr_repository" "imapfilter" {
   name                 = "${local.project_name}/imapfilter"
   image_tag_mutability = "MUTABLE"
