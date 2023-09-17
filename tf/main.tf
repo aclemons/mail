@@ -40,6 +40,32 @@ resource "aws_s3_bucket_public_access_block" "caffe_mail" {
   restrict_public_buckets = true
 }
 
+resource "aws_s3_bucket_policy" "miscellaneous" {
+  bucket = aws_s3_bucket.caffe_mail.id
+
+  policy = <<POLICY
+{
+  "Version":"2012-10-17",
+  "Statement":[
+    {
+      "Sid":"IncomingSES",
+      "Effect":"Allow",
+      "Principal":{
+        "Service":"ses.amazonaws.com"
+      },
+      "Action":"s3:PutObject",
+      "Resource":"arn:aws:s3:::${aws_s3_bucket.caffe_mail.id}/*",
+      "Condition":{
+        "StringEquals":{
+          "AWS:SourceAccount":"${data.aws_caller_identity.current.account_id}"
+        }
+      }
+    }
+  ]
+}
+POLICY
+}
+
 resource "aws_ecr_repository" "imapfilter" {
   name                 = "${local.project_name}/imapfilter"
   image_tag_mutability = "MUTABLE"
