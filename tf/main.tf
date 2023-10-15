@@ -286,6 +286,12 @@ resource "aws_lambda_function" "processor_lambda" {
   depends_on = [
     aws_cloudwatch_log_group.processor_lambda,
   ]
+
+  environment {
+    variables = {
+      BUCKET_NAME = aws_s3_bucket.caffe_mail.id
+    }
+  }
 }
 
 resource "aws_ssm_parameter" "processor_imap_host" {
