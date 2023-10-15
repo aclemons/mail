@@ -38,21 +38,39 @@ RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
     c_rehash && update-ca-certificates
 
 
-FROM base as imapfilter
+FROM base as rust
 
-COPY docker/imapfilter/build-imapfilter.sh /
-RUN bash /build-imapfilter.sh && rm /build-imapfilter.sh
+WORKDIR /tmp
 
+COPY processor processor
+
+# hadolint ignore=DL3003
+RUN sed -i '/PRIORITY=/s/extra //;/PRIORITY=/s/patches /patches extra /' /etc/slackpkg/slackpkg.conf && \
+    export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
+    slackpkg -default_answer=yes -batch=on install \
+    binutils \
+    gcc-11 \
+    glibc \
+    llvm-13 \
+    pkg-config \
+    rust \
+    && \
+    rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/* && \
+    (cd processor && CARGO_HOME=.cargo cargo build --release && cp target/release/processor /tmp/processor-bin) && \
+    rm -rf processor && mv /tmp/processor-bin /tmp/processor && \
+    slackpkg -default_answer=yes -batch=on remove \
+    binutils \
+    gcc-11 \
+    glibc \
+    llvm-13 \
+    pkg-config \
+    rust \
+    && echo "Built"
 
 FROM base
 COPY --from=lambda-layers /tmp/layer /opt
-RUN --mount=target=/tmp,source=tmp,from=imapfilter \
-    installpkg /tmp/*.txz
+COPY --from=rust --chmod=0755 /tmp/processor /usr/local/bin/processor
 
-COPY docker/imapfilter/entrypoint.sh /entrypoint.sh
-
-WORKDIR /imapfilter
-COPY docker/imapfilter/config.lua /imapfilter/config.lua
-COPY docker/imapfilter/run.sh /imapfilter/run.sh
+COPY docker/processor/entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

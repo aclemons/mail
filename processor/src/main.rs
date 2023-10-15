@@ -30,6 +30,8 @@ async fn s3_client() -> Client {
 async fn main() -> Result<(), Error> {
     let mut imap_session = build_imap();
 
+    imap_session.select("INBOX").unwrap();
+
     let bucket = env::var("BUCKET_NAME").unwrap();
 
     let client = s3_client().await;
