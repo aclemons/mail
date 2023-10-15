@@ -34,7 +34,7 @@ while true ; do
   IMAP_PASS="$(curl -f -s -H "X-Aws-Parameters-Secrets-Token: $AWS_SESSION_TOKEN" "$imap_pass_url" | jq '.Parameter | .Value')"
 
   ret=0
-  IMAP_USER="$IMAP_USER" IMAP_PASS="$IMAP_PASS" IMAP_HOST="$IMAP_HOST" /processor || ret=$?
+  IMAP_USER="$IMAP_USER" IMAP_PASS="$IMAP_PASS" IMAP_HOST="$IMAP_HOST" /usr/local/bin/processor || ret=$?
 
   if [ $ret -eq 0 ] ; then
     curl -f -sS -X POST "http://$AWS_LAMBDA_RUNTIME_API/2018-06-01/runtime/invocation/$REQUEST_ID/response" -d "{\"result\": 0}"
