@@ -55,7 +55,6 @@ RUN sed -i '/PRIORITY=/s/extra //;/PRIORITY=/s/patches /patches extra /' /etc/sl
     pkg-config \
     rust \
     && \
-    rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/* && \
     (cd processor && CARGO_HOME=.cargo cargo build --release && cp target/release/processor /tmp/processor-bin) && \
     rm -rf processor && mv /tmp/processor-bin /tmp/processor && \
     slackpkg -default_answer=yes -batch=on remove \
@@ -65,7 +64,8 @@ RUN sed -i '/PRIORITY=/s/extra //;/PRIORITY=/s/patches /patches extra /' /etc/sl
     llvm-13 \
     pkg-config \
     rust \
-    && echo "Built"
+    && rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/* && \
+    echo "Built"
 
 FROM base
 COPY --from=lambda-layers /tmp/layer /opt

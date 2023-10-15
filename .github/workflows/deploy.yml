@@ -96,6 +96,13 @@ jobs:
           terraform_version: ${{ env.TERRAFORM_VERSION }}
           terraform_wrapper: false
 
+      - name: Configure AWS Credentials (for terraform)
+        uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
+        with:
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mail-automation
+          role-duration-seconds: ${{ env.SESSION_DURATION }}
+
       - name: Terraform init
         run: terraform init -lockfile=readonly
         working-directory: tf

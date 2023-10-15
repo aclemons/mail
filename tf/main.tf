@@ -141,9 +141,9 @@ resource "aws_iam_role_policy_attachment" "lambda_insights_execution_role" {
   role       = aws_iam_role.iam_for_lambda.id
 }
 
-resource "aws_iam_policy" "imapfilter_lambda" {
-  name        = "${local.project_name}-imapfilter-lambda-ssm-policy"
-  description = "Policy to attach to ${local.project_name}-imapfilter lambda."
+resource "aws_iam_policy" "lambda_ssm_policy" {
+  name        = "${local.project_name}-lambda-ssm-policy"
+  description = "Policy to attach to ${local.project_name} lambdas for access to ssm."
 
   policy = jsonencode({
     Version = "2012-10-17"
@@ -162,7 +162,7 @@ resource "aws_iam_policy" "imapfilter_lambda" {
 }
 
 resource "aws_iam_role_policy_attachment" "this" {
-  policy_arn = aws_iam_policy.imapfilter_lambda.arn
+  policy_arn = aws_iam_policy.lambda_ssm_policy.arn
   role       = aws_iam_role.iam_for_lambda.id
 }
 
@@ -265,4 +265,64 @@ resource "aws_ecr_lifecycle_policy" "processor" {
     ]
 }
 EOF
+}
+
+resource "aws_cloudwatch_log_group" "processor_lambda" {
+  name = "/aws/lambda/${local.project_name}-processor"
+}
+
+resource "aws_lambda_function" "processor_lambda" {
+  function_name = "${local.project_name}-processor"
+  description   = "Process incoming mail from SES in the mail bucket."
+  role          = aws_iam_role.iam_for_lambda.arn
+
+  package_type = "Image"
+  image_uri    = "${aws_ecr_repository.processor.repository_url}:${var.docker_image_version}"
+
+  architectures = ["x86_64"]
+
+  timeout = 30
+
+  depends_on = [
+    aws_cloudwatch_log_group.processor_lambda,
+  ]
+}
+
+resource "aws_ssm_parameter" "processor_imap_host" {
+  name        = "/${local.project_name}/processor/imap_host"
+  description = "IMAP Host for uploading incoming mail."
+  type        = "SecureString"
+  tier        = "Intelligent-Tiering"
+  value       = "[]"
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "processor_imap_user" {
+  name        = "/${local.project_name}/processor/imap_user"
+  description = "IMAP user for uploading incoming mail."
+  type        = "SecureString"
+  tier        = "Intelligent-Tiering"
+  value       = "[]"
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [value]
+  }
+}
+
+resource "aws_ssm_parameter" "processor_imap_pass" {
+  name        = "/${local.project_name}/processor/imap_pass"
+  description = "IMAP pass for uploading incoming mail."
+  type        = "SecureString"
+  tier        = "Intelligent-Tiering"
+  value       = "[]"
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [value]
+  }
 }

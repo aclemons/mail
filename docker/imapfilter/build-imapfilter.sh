@@ -78,6 +78,7 @@ installpkg /tmp/*.txz
   bash imapfilter.SlackBuild
 )
 
+slackpkg -default_answer=yes -batch=on remove make guile gc gcc-11 glibc kernel-headers binutils
 rm -rf SlackBuildsOrg-slackbuilds-*
 rm -rf /tmp/SBo
-slackpkg -default_answer=yes -batch=on remove make guile gc gcc-11 glibc kernel-headers binutils
+rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/*
