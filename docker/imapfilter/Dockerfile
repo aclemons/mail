@@ -45,14 +45,15 @@ RUN bash /build-imapfilter.sh && rm /build-imapfilter.sh
 
 
 FROM base
-COPY --from=lambda-layers /tmp/layer /opt
 RUN --mount=target=/tmp,source=tmp,from=imapfilter \
     installpkg /tmp/*.txz
 
-COPY docker/imapfilter/entrypoint.sh /entrypoint.sh
+COPY --link --from=lambda-layers /tmp/layer /opt
+
+COPY --link docker/imapfilter/entrypoint.sh /entrypoint.sh
 
 WORKDIR /imapfilter
-COPY docker/imapfilter/config.lua /imapfilter/config.lua
-COPY docker/imapfilter/run.sh /imapfilter/run.sh
+COPY --link docker/imapfilter/config.lua /imapfilter/config.lua
+COPY --link docker/imapfilter/run.sh /imapfilter/run.sh
 
 ENTRYPOINT ["/entrypoint.sh"]

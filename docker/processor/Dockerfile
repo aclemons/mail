@@ -77,6 +77,6 @@ COPY --link --from=lambda-layers /tmp/layer /opt
 COPY --link --from=rust --chmod=0755 /tmp/processor /usr/local/bin/processor
 COPY --link --from=jq --chmod=0755 /usr/bin/jq /usr/bin/jq
 
-COPY docker/processor/entrypoint.sh /entrypoint.sh
+COPY --link docker/processor/entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
