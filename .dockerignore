@@ -1,0 +1,10 @@
+# Ignore everything
+*
+
+# Allow only the things we need
+!/docker/imapfilter/*
+!/docker/processor/*
+!/docker/shared/**/*zip
+
+!/processor/Cargo*
+!/processor/src/**/*.rs

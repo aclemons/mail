@@ -80,3 +80,4 @@ installpkg /tmp/*.txz
 
 rm -rf SlackBuildsOrg-slackbuilds-*
 rm -rf /tmp/SBo
+slackpkg -default_answer=yes -batch=on remove make guile gc gcc-11 glibc kernel-headers binutils
