@@ -66,6 +66,8 @@ resource "aws_s3_bucket_policy" "miscellaneous" {
 POLICY
 }
 
+# IMAP FILTER
+
 resource "aws_ecr_repository" "imapfilter" {
   name                 = "${local.project_name}/imapfilter"
   image_tag_mutability = "MUTABLE"
@@ -216,4 +218,51 @@ resource "aws_lambda_permission" "imapfilter_eventbridge" {
   action        = "lambda:InvokeFunction"
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.cron.arn
+}
+
+# IMCOMING MAIL PROCESSOR
+
+resource "aws_ecr_repository" "processor" {
+  name                 = "${local.project_name}/processor"
+  image_tag_mutability = "MUTABLE"
+
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+}
+
+resource "aws_ecr_lifecycle_policy" "processor" {
+  repository = aws_ecr_repository.processor.name
+
+  policy = <<EOF
+{
+    "rules": [
+        {
+            "rulePriority": 1,
+            "description": "Delete untagged images.",
+            "selection": {
+                "tagStatus": "untagged",
+                "countType": "imageCountMoreThan",
+                "countNumber": 1
+            },
+            "action": {
+                "type": "expire"
+            }
+        },
+        {
+            "rulePriority": 2,
+            "description": "Keep that last 2 git sha tagged images (last 2 merges to master).",
+            "selection": {
+                "tagStatus": "tagged",
+                "tagPrefixList": ["git"],
+                "countType": "imageCountMoreThan",
+                "countNumber": 2
+            },
+            "action": {
+                "type": "expire"
+            }
+        }
+    ]
+}
+EOF
 }
