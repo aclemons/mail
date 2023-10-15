@@ -49,37 +49,8 @@ export PKGTYPE=txz
   bash jq.SlackBuild
 )
 
-(
-  cd SlackBuildsOrg-slackbuilds-*
-
-  cd development/lua/
-
-  # shellcheck source=/dev/null
-  . lua.info
-
-  wget "$DOWNLOAD"
-  printf "%s\t%s\n" "$MD5SUM" "$(basename "$DOWNLOAD")" | md5sum --check --quiet
-  bash lua.SlackBuild
-)
-
-installpkg /tmp/*.txz
-
-(
-  cd SlackBuildsOrg-slackbuilds-*
-
-  cd network/imapfilter
-
-  # shellcheck source=/dev/null
-  . imapfilter.info
-
-  wget "$DOWNLOAD"
-  printf "%s\t%s\n" "$MD5SUM" "$(basename "$DOWNLOAD")" | md5sum --check --quiet
-  bash imapfilter.SlackBuild
-)
-
-removepkg jq lua
-
 slackpkg -default_answer=yes -batch=on remove make guile gc gcc-11 glibc kernel-headers binutils
+
 rm -rf SlackBuildsOrg-slackbuilds-*
 rm -rf /tmp/SBo
 rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/*

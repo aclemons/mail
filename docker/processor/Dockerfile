@@ -67,9 +67,15 @@ RUN sed -i '/PRIORITY=/s/extra //;/PRIORITY=/s/patches /patches extra /' /etc/sl
     && rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/* && \
     echo "Built"
 
+FROM base as jq
+
+COPY docker/processor/build-jq.sh /
+RUN bash /build-jq.sh && rm /build-jq.sh && installpkg /tmp/jq-* && rm -rf /tmp/jq*
+
 FROM base
-COPY --from=lambda-layers /tmp/layer /opt
-COPY --from=rust --chmod=0755 /tmp/processor /usr/local/bin/processor
+COPY --link --from=lambda-layers /tmp/layer /opt
+COPY --link --from=rust --chmod=0755 /tmp/processor /usr/local/bin/processor
+COPY --link --from=jq --chmod=0755 /usr/bin/jq /usr/bin/jq
 
 COPY docker/processor/entrypoint.sh /entrypoint.sh
 
