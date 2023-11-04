@@ -27,11 +27,13 @@ while true ; do
   printf 'Processing request %s\n' "$REQUEST_ID"
 
   printf 'Fetching imap host from parameters and secrets extension %s\n' "$imap_host_url"
-  IMAP_HOST="$(curl -f -s -H "X-Aws-Parameters-Secrets-Token: $AWS_SESSION_TOKEN" "$imap_host_url" | jq '.Parameter | .Value')"
+  IMAP_HOST="$(curl -f -s -H "X-Aws-Parameters-Secrets-Token: $AWS_SESSION_TOKEN" "$imap_host_url" | jq -r '.Parameter | .Value')"
   printf 'Fetching imap user from parameters and secrets extension %s\n' "$imap_user_url"
-  IMAP_USER="$(curl -f -s -H "X-Aws-Parameters-Secrets-Token: $AWS_SESSION_TOKEN" "$imap_user_url" | jq '.Parameter | .Value')"
+  IMAP_USER="$(curl -f -s -H "X-Aws-Parameters-Secrets-Token: $AWS_SESSION_TOKEN" "$imap_user_url" | jq -r '.Parameter | .Value')"
   printf 'Fetching imap pass from parameters and secrets extension %s\n' "$imap_pass_url"
-  IMAP_PASS="$(curl -f -s -H "X-Aws-Parameters-Secrets-Token: $AWS_SESSION_TOKEN" "$imap_pass_url" | jq '.Parameter | .Value')"
+  IMAP_PASS="$(curl -f -s -H "X-Aws-Parameters-Secrets-Token: $AWS_SESSION_TOKEN" "$imap_pass_url" | jq -r '.Parameter | .Value')"
+
+  printf 'Connection to %s as %s:*****\n' "$IMAP_HOST" "$IMAP_USER"
 
   ret=0
   IMAP_USER="$IMAP_USER" IMAP_PASS="$IMAP_PASS" IMAP_HOST="$IMAP_HOST" /usr/local/bin/processor || ret=$?
