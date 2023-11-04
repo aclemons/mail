@@ -180,7 +180,7 @@ resource "aws_lambda_function" "imapfilter_lambda" {
 
   architectures = ["x86_64"]
 
-  timeout = 30
+  timeout = 60
 
   depends_on = [
     aws_cloudwatch_log_group.imapfilter_lambda,
