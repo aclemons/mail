@@ -332,3 +332,22 @@ resource "aws_ssm_parameter" "processor_imap_pass" {
     ignore_changes  = [value]
   }
 }
+
+resource "aws_lambda_permission" "allow_bucket" {
+  statement_id  = "AllowExecutionFromS3Bucket"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.processor_lambda.arn
+  principal     = "s3.amazonaws.com"
+  source_arn    = aws_s3_bucket.caffe_mail.arn
+}
+
+resource "aws_s3_bucket_notification" "incoming_mail_notification" {
+  bucket = aws_s3_bucket.caffe_mail.id
+
+  lambda_function {
+    lambda_function_arn = aws_lambda_function.processor_lambda.arn
+    events              = ["s3:ObjectCreated:*"]
+  }
+
+  depends_on = [aws_lambda_permission.allow_bucket]
+}
