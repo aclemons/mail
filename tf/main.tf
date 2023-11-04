@@ -126,21 +126,6 @@ data "aws_iam_policy_document" "assume_role" {
   }
 }
 
-resource "aws_iam_role" "iam_for_lambda" {
-  name               = "mail-imapfilter-lambda-role"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_basic_execution_role" {
-  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  role       = aws_iam_role.iam_for_lambda.id
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_insights_execution_role" {
-  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
-  role       = aws_iam_role.iam_for_lambda.id
-}
-
 resource "aws_iam_policy" "lambda_ssm_policy" {
   name        = "${local.project_name}-lambda-ssm-policy"
   description = "Policy to attach to ${local.project_name} lambdas for access to ssm."
@@ -161,9 +146,24 @@ resource "aws_iam_policy" "lambda_ssm_policy" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "this" {
+resource "aws_iam_role" "iam_for_imapfilter_lambda" {
+  name               = "mail-imapfilter-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "imapfilter_lambda_basic_execution_role" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role       = aws_iam_role.iam_for_imapfilter_lambda.id
+}
+
+resource "aws_iam_role_policy_attachment" "imapfilter_lambda_insights_execution_role" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
+  role       = aws_iam_role.iam_for_imapfilter_lambda.id
+}
+
+resource "aws_iam_role_policy_attachment" "imapfilter_ssm" {
   policy_arn = aws_iam_policy.lambda_ssm_policy.arn
-  role       = aws_iam_role.iam_for_lambda.id
+  role       = aws_iam_role.iam_for_imapfilter_lambda.id
 }
 
 resource "aws_cloudwatch_log_group" "imapfilter_lambda" {
@@ -173,7 +173,7 @@ resource "aws_cloudwatch_log_group" "imapfilter_lambda" {
 resource "aws_lambda_function" "imapfilter_lambda" {
   function_name = "${local.project_name}-imapfilter"
   description   = "Run imapfilter to synchronise multiple email accounts and filter mails into directories."
-  role          = aws_iam_role.iam_for_lambda.arn
+  role          = aws_iam_role.iam_for_imapfilter_lambda.arn
 
   package_type = "Image"
   image_uri    = "${aws_ecr_repository.imapfilter.repository_url}:${var.docker_image_version}"
@@ -267,6 +267,26 @@ resource "aws_ecr_lifecycle_policy" "processor" {
 EOF
 }
 
+resource "aws_iam_role" "iam_for_processor_lambda" {
+  name               = "mail-processor-lambda-role"
+  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+}
+
+resource "aws_iam_role_policy_attachment" "processor_lambda_basic_execution_role" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+  role       = aws_iam_role.iam_for_processor_lambda.id
+}
+
+resource "aws_iam_role_policy_attachment" "processor_lambda_insights_execution_role" {
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
+  role       = aws_iam_role.iam_for_processor_lambda.id
+}
+
+resource "aws_iam_role_policy_attachment" "processor_ssm" {
+  policy_arn = aws_iam_policy.lambda_ssm_policy.arn
+  role       = aws_iam_role.iam_for_processor_lambda.id
+}
+
 resource "aws_cloudwatch_log_group" "processor_lambda" {
   name = "/aws/lambda/${local.project_name}-processor"
 }
@@ -274,7 +294,7 @@ resource "aws_cloudwatch_log_group" "processor_lambda" {
 resource "aws_lambda_function" "processor_lambda" {
   function_name = "${local.project_name}-processor"
   description   = "Process incoming mail from SES in the mail bucket."
-  role          = aws_iam_role.iam_for_lambda.arn
+  role          = aws_iam_role.iam_for_processor_lambda.arn
 
   package_type = "Image"
   image_uri    = "${aws_ecr_repository.processor.repository_url}:${var.docker_image_version}"
@@ -334,11 +354,13 @@ resource "aws_ssm_parameter" "processor_imap_pass" {
 }
 
 resource "aws_lambda_permission" "allow_bucket" {
-  statement_id  = "AllowExecutionFromS3Bucket"
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.processor_lambda.arn
-  principal     = "s3.amazonaws.com"
-  source_arn    = aws_s3_bucket.caffe_mail.arn
+  statement_id = "invoke-processor-for-incoming-mail"
+
+  action         = "lambda:InvokeFunction"
+  function_name  = "arn:aws:lambda:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:function:${aws_lambda_function.processor_lambda.function_name}"
+  principal      = "s3.amazonaws.com"
+  source_account = data.aws_caller_identity.current.account_id
+  source_arn     = aws_s3_bucket.caffe_mail.arn
 }
 
 resource "aws_s3_bucket_notification" "incoming_mail_notification" {
@@ -350,4 +372,61 @@ resource "aws_s3_bucket_notification" "incoming_mail_notification" {
   }
 
   depends_on = [aws_lambda_permission.allow_bucket]
+}
+
+resource "aws_iam_policy" "processor_lambda_s3_policy" {
+  name        = "${local.project_name}-processor-lambda-s3-policy"
+  description = "Policy to attach to ${local.project_name}-processor lambda for handling incoming mail data."
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:ListBucket",
+        ]
+        Resource = [
+          aws_s3_bucket.caffe_mail.arn
+        ]
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:DeleteObject",
+        ]
+        Resource = [
+          "${aws_s3_bucket.caffe_mail.arn}/*"
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "processor_lambda_s3_policy" {
+  policy_arn = aws_iam_policy.processor_lambda_s3_policy.arn
+  role       = aws_iam_role.iam_for_processor_lambda.id
+}
+
+# in case we miss an event, also run once a day
+
+resource "aws_cloudwatch_event_rule" "processor_cron" {
+  name        = "${local.project_name}-processor-cron"
+  description = "Invokes ${local.project_name}-processor Lambda function every day."
+
+  schedule_expression = "rate(1 day)"
+}
+
+resource "aws_cloudwatch_event_target" "processor" {
+  rule = aws_cloudwatch_event_rule.processor_cron.id
+  arn  = aws_lambda_function.processor_lambda.arn
+}
+
+resource "aws_lambda_permission" "processor_eventbridge" {
+  function_name = "${local.project_name}-processor"
+  statement_id  = "EventBridgePermissions"
+  action        = "lambda:InvokeFunction"
+  principal     = "events.amazonaws.com"
+  source_arn    = aws_cloudwatch_event_rule.processor_cron.arn
 }
