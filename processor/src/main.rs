@@ -44,7 +44,7 @@ async fn main() -> Result<(), Error> {
         .await
         .unwrap();
 
-    for obj in objects.contents().unwrap_or_default() {
+    for obj in objects.contents() {
         let key = obj.key().unwrap();
 
         let full_object = client
