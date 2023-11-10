@@ -54,8 +54,8 @@ jobs:
         with:
           push: true
           platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ github.ref_name }}-imapfilter
+          cache-to: type=gha,mode=max,scope=${{ github.ref_name }}-imapfilter
           context: .
           file: docker/imapfilter/Dockerfile
           provenance: false
@@ -68,8 +68,8 @@ jobs:
         with:
           push: true
           platforms: linux/amd64
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ github.ref_name }}-processor
+          cache-to: type=gha,mode=max,scope=${{ github.ref_name }}-processor
           context: .
           file: docker/processor/Dockerfile
           provenance: false
