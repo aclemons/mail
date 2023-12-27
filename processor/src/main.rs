@@ -4,7 +4,7 @@ extern crate native_tls;
 use std::env;
 
 use aws_config::meta::region::RegionProviderChain;
-use aws_sdk_s3::{Client, Error};
+use aws_sdk_s3::{types::Error, Client};
 use imap::Session;
 use native_tls::TlsStream;
 
@@ -21,9 +21,13 @@ fn build_imap() -> Session<TlsStream<std::net::TcpStream>> {
 
 async fn s3_client() -> Client {
     let region_provider = RegionProviderChain::default_provider();
-    let config = aws_config::from_env().region(region_provider).load().await;
+    let config = aws_config::defaults(aws_config::BehaviorVersion::v2023_11_09())
+        .region(region_provider)
+        .load()
+        .await;
 
-    return Client::new(&config);
+    let client = aws_sdk_s3::Client::new(&config);
+    return client;
 }
 
 #[tokio::main]
@@ -64,7 +68,8 @@ async fn main() -> Result<(), Error> {
             .bucket(bucket.clone())
             .key(key)
             .send()
-            .await?;
+            .await
+            .unwrap();
     }
 
     imap_session.close().unwrap();
