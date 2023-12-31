@@ -167,7 +167,8 @@ resource "aws_iam_role_policy_attachment" "imapfilter_ssm" {
 }
 
 resource "aws_cloudwatch_log_group" "imapfilter_lambda" {
-  name = "/aws/lambda/${local.project_name}-imapfilter"
+  name              = "/aws/lambda/${local.project_name}-imapfilter"
+  retention_in_days = 14
 }
 
 resource "aws_lambda_function" "imapfilter_lambda" {
@@ -288,7 +289,8 @@ resource "aws_iam_role_policy_attachment" "processor_ssm" {
 }
 
 resource "aws_cloudwatch_log_group" "processor_lambda" {
-  name = "/aws/lambda/${local.project_name}-processor"
+  name              = "/aws/lambda/${local.project_name}-processor"
+  retention_in_days = 14
 }
 
 resource "aws_lambda_function" "processor_lambda" {
