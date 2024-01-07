@@ -12,7 +12,7 @@ env:
 
 jobs:
   docker:
-    name: Apply terraform
+    name: Apply tofu
     runs-on: ubuntu-22.04
     permissions:
       id-token: write
@@ -77,36 +77,36 @@ jobs:
             ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/mail/processor:latest
             ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_DEFAULT_REGION }}.amazonaws.com/mail/processor:${{ env.DOCKER_IMAGE_VERSION }}
 
-      - name: Configure terraform plugin cache
+      - name: Configure tofu plugin cache
         run: |
-          printf 'plugin_cache_dir = "%s/.terraform.d/plugin-cache"\n' "$HOME" > ~/.terraformrc
-          mkdir -p ~/.terraform.d/plugin-cache
+          printf 'plugin_cache_dir = "%s/.tofu.d/plugin-cache"\n' "$HOME" > ~/.tofurc
+          mkdir -p ~/.tofu.d/plugin-cache
 
-      - name: Cache Terraform plugins
+      - name: Cache Tofu plugins
         uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
         with:
-          path: ~/.terraform.d/plugin-cache
-          key: ${{ runner.os }}-terraform-${{ hashFiles('**/.terraform.lock.hcl') }}
+          path: ~/.tofu.d/plugin-cache
+          key: ${{ runner.os }}-tofu-${{ hashFiles('**/.terraform.lock.hcl') }}
 
-      - name: Set terraform version
-        run: echo "TERRAFORM_VERSION=$(cat tf/.terraform-version)" >> "$GITHUB_ENV"
+      - name: Set tofu version
+        run: echo "TOFU_VERSION=$(cat tf/.opentofu-version)" >> "$GITHUB_ENV"
 
-      - uses: hashicorp/setup-terraform@a1502cd9e758c50496cc9ac5308c4843bcd56d36 # v3.0.0
+      - uses: opentofu/setup-opentofu@b06654f7ba51088e987c0a454d042360df3ebe86 # v1.0.1
         with:
-          terraform_version: ${{ env.TERRAFORM_VERSION }}
-          terraform_wrapper: false
+          tofu_version: ${{ env.TOFU_VERSION }}
+          tofu_wrapper: false
 
-      - name: Configure AWS Credentials (for terraform)
+      - name: Configure AWS Credentials (for tofu)
         uses: aws-actions/configure-aws-credentials@010d0da01d0b5a38af31e9c3470dbfdabdecca3a # v4.0.1
         with:
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mail-automation
           role-duration-seconds: ${{ env.SESSION_DURATION }}
 
-      - name: Terraform init
-        run: terraform init -lockfile=readonly
+      - name: Tofu init
+        run: tofu init -lockfile=readonly
         working-directory: tf
 
-      - name: Terraform apply
-        run: terraform apply -auto-approve -input=false -var docker_image_version=${{ env.DOCKER_IMAGE_VERSION }}
+      - name: Tofu apply
+        run: tofu apply -auto-approve -input=false -var docker_image_version=${{ env.DOCKER_IMAGE_VERSION }}
         working-directory: tf
