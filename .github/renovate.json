@@ -11,6 +11,17 @@
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?_VERSION=\"(?<currentValue>.*)\""
       ],
       "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "opentofu/opentofu",
+      "fileMatch": [
+        "^tf/.opentofu-version$"
+      ],
+      "matchStrings": [
+        "(?<currentValue>.*)"
+      ]
     }
   ],
   "extends": [
