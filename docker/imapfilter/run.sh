@@ -21,10 +21,21 @@ printf 'Using main imap server %s, logging in with user: %s\n' "$MAIN_IMAP" "$MA
 MAIN_PASS="$(printf '%s\n' "$ACCOUNTS" | jq -r '.[0] | .password')"
 export MAIN_PASS
 
+ret=0
 printf '%s\n' "$ACCOUNTS" | jq -r 'del(.[0])' | jq -c '.[]' | while read -r acc ; do
+  set +e
   OTHER_IMAP="$(printf '%s\n' "$acc" | jq -r '.imap')" \
   OTHER_USER="$(printf '%s\n' "$acc" | jq -r '.user')" \
   OTHER_PASS="$(printf '%s\n' "$acc" | jq -r '.password')" \
   OTHER_JUNK="$(printf '%s\n' "$acc" | jq -r '.junk' | sed 's/^null$//')" \
     imapfilter -v -c /imapfilter/config.lua
+  acc_ret=$?
+  set -e
+
+  if [ $acc_ret -ne 0 ] ; then
+    printf 'Processing mail for %s failed\n' "$OTHER_IMAP"
+    ret=$acc_ret
+  fi
 done
+
+exit $ret
