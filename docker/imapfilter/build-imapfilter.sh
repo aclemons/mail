@@ -62,7 +62,7 @@ export PKGTYPE=txz
   bash lua.SlackBuild
 )
 
-installpkg /tmp/*.txz
+installpkg /tmp/lua*.txz
 
 (
   cd SlackBuildsOrg-slackbuilds-*
@@ -77,7 +77,7 @@ installpkg /tmp/*.txz
   bash imapfilter.SlackBuild
 )
 
-removepkg jq lua
+removepkg lua
 
 slackpkg -default_answer=yes -batch=on remove make guile gc gcc-11 glibc kernel-headers binutils
 rm -rf SlackBuildsOrg-slackbuilds-*
