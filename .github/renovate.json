@@ -22,6 +22,19 @@
       "matchStrings": [
         "(?<currentValue>.*)"
       ]
+    },
+    {
+      "currentValueTemplate": "master",
+      "customType": "regex",
+      "datasourceTemplate": "git-refs",
+      "depNameTemplate": "gmail-oauth2-tools master sha",
+      "fileMatch": [
+        "^docker\\/imapfilter\\/Dockerfile$"
+      ],
+      "matchStrings": [
+        "ARG GMAIL_OAUTH2_TOOLS_SHA=(?<currentDigest>.*)"
+      ],
+      "packageNameTemplate": "https://github.com/google/gmail-oauth2-tools"
     }
   ],
   "extends": [

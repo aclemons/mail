@@ -38,7 +38,8 @@ RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
     rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/* && \
     c_rehash && update-ca-certificates
 
-RUN curl -f -o /usr/bin/oauth2.py https://raw.githubusercontent.com/google/gmail-oauth2-tools/81ced795c11ed0adb2fdbbd66a54a4f6af2586aa/python/oauth2.py && chmod 0755 /usr/bin/oauth2.py
+ARG GMAIL_OAUTH2_TOOLS_SHA=81ced795c11ed0adb2fdbbd66a54a4f6af2586aa
+RUN curl -f -o /usr/bin/oauth2.py https://raw.githubusercontent.com/google/gmail-oauth2-tools/$GMAIL_OAUTH2_TOOLS_SHA/python/oauth2.py && chmod 0755 /usr/bin/oauth2.py
 
 FROM base as imapfilter
 
