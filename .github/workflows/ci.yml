@@ -4,6 +4,10 @@ name: Build and deploy mail infrastructure
 
 on: [pull_request]
 
+env:
+  AWS_DEFAULT_REGION: eu-central-1
+  SESSION_DURATION: 900
+
 jobs:
   ci:
     name: Build and test
