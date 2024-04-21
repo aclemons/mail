@@ -72,11 +72,23 @@ FROM base as jq
 COPY docker/processor/build-jq.sh /
 RUN bash /build-jq.sh && rm /build-jq.sh && installpkg /tmp/jq-* && rm -rf /tmp/jq*
 
+FROM base as lambda-tools
+
+# renovate: datasource=github-releases depName=aws/aws-lambda-runtime-interface-emulator
+ENV AWS_LAMBDA_RIE_VERSION=v1.18
+
+WORKDIR /tmp
+RUN \
+    curl -o /usr/local/bin/aws-lambda-rie -L "https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/download/$AWS_LAMBDA_RIE_VERSION/aws-lambda-rie-x86_64" && \
+    chown root:root /usr/local/bin/aws-lambda-rie && chmod 0755 /usr/local/bin/aws-lambda-rie
+
 FROM base
+COPY --link --from=lambda-tools /usr/local/bin/aws-lambda-rie /usr/local/bin/aws-lambda-rie
 COPY --link --from=lambda-layers /tmp/layer /opt
 COPY --link --from=rust --chmod=0755 /tmp/processor /usr/local/bin/processor
 COPY --link --from=jq --chmod=0755 /usr/bin/jq /usr/bin/jq
 
+COPY --link docker/processor/local.sh /local.sh
 COPY --link docker/processor/entrypoint.sh /entrypoint.sh
 
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/local.sh"]

@@ -1,0 +1,31 @@
+---
+services:
+  localstack:
+    image: localstack/localstack:3.3.0@sha256:b5c082a6d78d49fc4a102841648a8adeab4895f7d9a4ad042d7d485aed2da10d
+    environment:
+      - EAGER_SERVICE_LOADING=1
+      - SERVICES=s3,ssm
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - DEBUG=${DEBUG-}
+    ports:
+      - 4566:4566
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+  processor:
+    image: mail/processor:latest
+    build:
+      context: .
+      dockerfile: docker/processor/Dockerfile
+    ports:
+      - 9001:8080
+    extra_hosts:
+      - localhost:host-gateway
+  imapfilter:
+    image: mail/imapfilter:latest
+    build:
+      context: .
+      dockerfile: docker/imapfilter/Dockerfile
+    ports:
+      - 9002:8080
+    extra_hosts:
+      - localhost:host-gateway
