@@ -42,20 +42,20 @@ FROM base as rust
 
 WORKDIR /tmp
 
+COPY docker/processor/build-rust16.sh .
 COPY processor processor
 
 # hadolint ignore=DL3003
-RUN sed -i '/PRIORITY=/s/extra //;/PRIORITY=/s/patches /patches extra /' /etc/slackpkg/slackpkg.conf && \
-    export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
+RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
     slackpkg -default_answer=yes -batch=on install \
     binutils \
     gcc-11 \
     glibc \
     llvm-13 \
     pkg-config \
-    rust \
     && \
-    (cd processor && CARGO_HOME=.cargo cargo build --release && cp target/release/processor /tmp/processor-bin) && \
+    bash build-rust16.sh && rm build-rust16.sh && installpkg /tmp/rust16-* && rm -rf /tmp/rust16* && \
+    (cd processor && PATH="/opt/rust16/bin:$PATH" LD_LIBRARY_PATH="/opt/rust16/lib64" CARGO_HOME=.cargo cargo build --release && cp target/release/processor /tmp/processor-bin) && \
     rm -rf processor && mv /tmp/processor-bin /tmp/processor && \
     slackpkg -default_answer=yes -batch=on remove \
     binutils \
@@ -63,8 +63,8 @@ RUN sed -i '/PRIORITY=/s/extra //;/PRIORITY=/s/patches /patches extra /' /etc/sl
     glibc \
     llvm-13 \
     pkg-config \
-    rust \
     && rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/* && \
+    removepkg rust16 && \
     echo "Built"
 
 FROM base as jq
