@@ -183,6 +183,8 @@ resource "aws_lambda_function" "imapfilter_lambda" {
 
   timeout = 60
 
+  reserved_concurrent_executions = 1
+
   depends_on = [
     aws_cloudwatch_log_group.imapfilter_lambda,
   ]
@@ -304,6 +306,8 @@ resource "aws_lambda_function" "processor_lambda" {
   architectures = ["x86_64"]
 
   timeout = 30
+
+  reserved_concurrent_executions = 1
 
   depends_on = [
     aws_cloudwatch_log_group.processor_lambda,
