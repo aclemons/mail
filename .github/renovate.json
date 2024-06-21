@@ -5,7 +5,8 @@
       "customType": "regex",
       "fileMatch": [
         "^docker/imapfilter/build-imapfilter.sh$",
-        "^docker/processor/build-jq.sh$"
+        "^docker/processor/build-jq.sh$",
+        "^docker/processor/build-rust16.sh$"
       ],
       "matchStrings": [
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?_VERSION=\"(?<currentValue>.*)\""
