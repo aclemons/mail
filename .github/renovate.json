@@ -18,10 +18,21 @@
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "opentofu/opentofu",
       "fileMatch": [
-        "^tf/.opentofu-version$"
+        "^tf/\\.opentofu-version$"
       ],
       "matchStrings": [
         "(?<currentValue>.*)"
+      ]
+    },
+    {
+      "customType": "regex",
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "opentofu/opentofu",
+      "fileMatch": [
+        "^tf/.*\\.tf$"
+      ],
+      "matchStrings": [
+        "required_version\\s=\\s\"(?<currentValue>.*?)\""
       ]
     },
     {
@@ -53,11 +64,11 @@
     {
       "description": "Disable terraform updates (renovate does not yet support opentofu)",
       "enabled": false,
+      "matchDepNames": [
+        "hashicorp/terraform"
+      ],
       "matchDepTypes": [
         "required_version"
-      ],
-      "matchPackageNames": [
-        "hashicorp/terraform"
       ]
     }
   ],
