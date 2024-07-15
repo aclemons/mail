@@ -436,3 +436,21 @@ resource "aws_lambda_permission" "processor_eventbridge" {
   principal     = "events.amazonaws.com"
   source_arn    = aws_cloudwatch_event_rule.processor_cron.arn
 }
+
+resource "aws_iam_user" "smtp_user" {
+  name = "mail-ses-smtp-user.20240715-205419"
+}
+
+data "aws_iam_policy_document" "ses_send" {
+  statement {
+    effect    = "Allow"
+    actions   = ["ses:SendRawEmail"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_user_policy" "ses_send" {
+  name   = "AmazonSesSendingAccess"
+  user   = aws_iam_user.smtp_user.name
+  policy = data.aws_iam_policy_document.ses_send.json
+}
