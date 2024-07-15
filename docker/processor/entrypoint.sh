@@ -25,6 +25,7 @@ while true ; do
   rm -rf "$HEADERS"
 
   printf 'Processing request %s\n' "$REQUEST_ID"
+  printf 'Processing payload %s\n' "$(cat "$BODY")"
 
   printf 'Fetching imap host from parameters and secrets extension %s\n' "$imap_host_url"
   IMAP_HOST="$(curl -f -s -H "X-Aws-Parameters-Secrets-Token: $AWS_SESSION_TOKEN" "$imap_host_url" | jq -r '.Parameter | .Value')"
