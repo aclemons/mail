@@ -27,7 +27,7 @@ set -o pipefail
 export TERSE=0
 
 # renovate: datasource=github-tags depName=SlackBuildsOrg/slackbuilds versioning=loose
-SBO_RELEASE_VERSION="15.0-20240817.1"
+SBO_RELEASE_VERSION="15.0-20240824.1"
 wget -O - "https://github.com/SlackBuildsOrg/slackbuilds/tarball/$SBO_RELEASE_VERSION" | tar xz
 
 export TAG=_aclemons
