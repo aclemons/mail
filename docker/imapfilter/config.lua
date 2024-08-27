@@ -34,3 +34,6 @@ if (junk ~= nil and junk ~= '') then
   results = other_account[junk]:select_all()
   results:move_messages(main_account['Spam'])
 end
+
+results = main_account.INBOX:contain_field('List-ID',  'SlackBuildsOrg/slackbuilds')
+results:move_messages(main_account['github'])
