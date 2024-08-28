@@ -37,3 +37,6 @@ end
 
 results = main_account.INBOX:contain_field('List-ID',  'SlackBuildsOrg/slackbuilds')
 results:move_messages(main_account['github'])
+
+results = main_account.INBOX:contain_field('List-Id',  'slackbuilds-devel.slackbuilds.org')
+results:move_messages(main_account['slackbuilds-devel'])
