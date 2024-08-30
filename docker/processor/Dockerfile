@@ -1,10 +1,10 @@
 # syntax=docker/dockerfile:1.9.0@sha256:fe40cf4e92cd0c467be2cfc30657a680ae2398318afd50b0c80585784c604f28
 
-FROM aclemons/slackware:15.0@sha256:b6a050075864911b07dbb058586fc0baecd9e07925954fc229af0d5b5fe329e7 as slackware-base
+FROM aclemons/slackware:15.0@sha256:b6a050075864911b07dbb058586fc0baecd9e07925954fc229af0d5b5fe329e7 AS slackware-base
 RUN sed -i '/^WGETFLAGS/s/"$/ -q"/' /etc/slackpkg/slackpkg.conf
 
 
-FROM slackware-base as lambda-layers
+FROM slackware-base AS lambda-layers
 
 WORKDIR /tmp
 RUN --mount=target=/layers,source=docker/shared/layers \
@@ -18,7 +18,7 @@ RUN --mount=target=/layers,source=docker/shared/layers \
     removepkg infozip
 
 
-FROM slackware-base as base
+FROM slackware-base AS base
 
 RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
     slackpkg -default_answer=yes -batch=on install \
@@ -38,7 +38,7 @@ RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
     c_rehash && update-ca-certificates
 
 
-FROM base as rust
+FROM base AS rust
 
 WORKDIR /tmp
 
@@ -67,12 +67,12 @@ RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
     removepkg rust16 && \
     echo "Built"
 
-FROM base as jq
+FROM base AS jq
 
 COPY docker/processor/build-jq.sh /
 RUN bash /build-jq.sh && rm /build-jq.sh && installpkg /tmp/jq-* && rm -rf /tmp/jq*
 
-FROM base as lambda-tools
+FROM base AS lambda-tools
 
 # renovate: datasource=github-releases depName=aws/aws-lambda-runtime-interface-emulator
 ENV AWS_LAMBDA_RIE_VERSION=v1.21
