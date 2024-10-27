@@ -36,16 +36,16 @@ export PKGTYPE=txz
 (
   cd SlackBuildsOrg-slackbuilds-*
 
-  cd development/rust16
+  cd development/rust-opt
 
   # shellcheck source=/dev/null
-  . rust16.info
+  . rust-opt.info
 
   # shellcheck disable=SC2154
   wget "$DOWNLOAD_x86_64"
   # shellcheck disable=SC2154
   printf "%s\t%s\n" "$MD5SUM_x86_64" "$(basename "$DOWNLOAD_x86_64")" | md5sum --check --quiet
-  bash rust16.SlackBuild
+  bash rust-opt.SlackBuild
 )
 
 rm -rf SlackBuildsOrg-slackbuilds-*
