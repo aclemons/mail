@@ -30,7 +30,7 @@ slackpkg -default_answer=yes -batch=on update
 slackpkg -default_answer=yes -batch=on install make guile gc gcc-11 glibc kernel-headers binutils
 
 # renovate: datasource=github-tags depName=SlackBuildsOrg/slackbuilds versioning=loose
-SBO_RELEASE_VERSION="15.0-20241026.1"
+SBO_RELEASE_VERSION="d4582f2e31e793f3fa15590e11be0f933ed89e40"
 wget -O - "https://github.com/SlackBuildsOrg/slackbuilds/tarball/$SBO_RELEASE_VERSION" | tar xz
 
 export TAG=_aclemons
