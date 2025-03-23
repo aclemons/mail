@@ -51,6 +51,7 @@ RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
     binutils \
     gcc-11 \
     glibc \
+    kernel-headers \
     llvm-13 \
     pkg-config \
     && \
@@ -61,6 +62,7 @@ RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
     binutils \
     gcc-11 \
     glibc \
+    kernel-headers \
     llvm-13 \
     pkg-config \
     && rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/* && \
