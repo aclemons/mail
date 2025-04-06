@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 imap = "=2.4.1"
 native-tls = "=0.2.14"
-aws-config = "=1.6.0"
+aws-config = "=1.6.1"
 aws-sdk-s3 = "=1.82.0"
 tokio = { version = "=1.44.1", features = ["full"] }
 
