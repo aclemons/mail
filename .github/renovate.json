@@ -3,10 +3,10 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^docker/imapfilter/build-imapfilter.sh$",
-        "^docker/processor/build-jq.sh$",
-        "^docker/processor/build-rust-opt.sh$"
+      "managerFilePatterns": [
+        "/^docker/imapfilter/build-imapfilter.sh$/",
+        "/^docker/processor/build-jq.sh$/",
+        "/^docker/processor/build-rust-opt.sh$/"
       ],
       "matchStrings": [
         "datasource=(?<datasource>.*?) depName=(?<depName>.*?)( versioning=(?<versioning>.*?))?\\s.*?_VERSION=\"(?<currentValue>.*)\""
@@ -17,8 +17,8 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "opentofu/opentofu",
-      "fileMatch": [
-        "^tf/\\.opentofu-version$"
+      "managerFilePatterns": [
+        "/^tf/\\.opentofu-version$/"
       ],
       "matchStrings": [
         "(?<currentValue>.*)"
@@ -28,8 +28,8 @@
       "customType": "regex",
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "opentofu/opentofu",
-      "fileMatch": [
-        "^tf/.*\\.tf$"
+      "managerFilePatterns": [
+        "/^tf/.*\\.tf$/"
       ],
       "matchStrings": [
         "required_version\\s=\\s\"(?<currentValue>.*?)\""
@@ -40,8 +40,8 @@
       "customType": "regex",
       "datasourceTemplate": "git-refs",
       "depNameTemplate": "gmail-oauth2-tools master sha",
-      "fileMatch": [
-        "^docker\\/imapfilter\\/Dockerfile$"
+      "managerFilePatterns": [
+        "/^docker\\/imapfilter\\/Dockerfile$/"
       ],
       "matchStrings": [
         "ARG GMAIL_OAUTH2_TOOLS_SHA=(?<currentDigest>.*)"
@@ -50,9 +50,9 @@
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "(^|/)(workflow-templates|\\.(?:github|gitea|forgejo)/(?:workflows|actions))/.+\\.ya?ml$",
-        "(^|/)action\\.ya?ml$"
+      "managerFilePatterns": [
+        "/(^|/)(workflow-templates|\\.(?:github|gitea|forgejo)/(?:workflows|actions))/.+\\.ya?ml$/",
+        "/(^|/)action\\.ya?ml$/"
       ],
       "matchStrings": [
         "# renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: (?:lookupName|packageName)=(?<packageName>[^\\s]+?))?(?: versioning=(?<versioning>[^\\s]+?))?(?: extractVersion=(?<extractVersion>[^\\s]+?))?\\s+[A-Za-z0-9_]+?_IMAGE\\s*:\\s*[\"']?(?<currentValue>.+?)@(?<currentDigest>sha256:[a-f0-9]+)[\"']?\\s"
