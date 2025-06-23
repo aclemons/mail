@@ -77,7 +77,7 @@ RUN bash /build-jq.sh && rm /build-jq.sh && installpkg /tmp/jq-* && rm -rf /tmp/
 FROM base AS lambda-tools
 
 # renovate: datasource=github-releases depName=aws/aws-lambda-runtime-interface-emulator
-ENV AWS_LAMBDA_RIE_VERSION=v1.25
+ENV AWS_LAMBDA_RIE_VERSION=v1.26
 
 WORKDIR /tmp
 RUN \
