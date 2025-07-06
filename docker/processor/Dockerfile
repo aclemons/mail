@@ -89,7 +89,7 @@ COPY --link --from=lambda-tools /usr/local/bin/aws-lambda-rie /usr/local/bin/aws
 COPY --link --from=lambda-layers /tmp/layer /opt
 COPY --link --from=rust --chmod=0755 /tmp/processor /usr/local/bin/processor
 COPY --link --from=jq --chmod=0755 /usr/bin/jq /usr/bin/jq
-COPY --link --from=jq --chmod=0755 /usr/bin/usr/lib64/libjq* /usr/lib64/
+COPY --link --from=jq --chmod=0755 /usr/lib64/libjq* /usr/lib64/
 
 COPY --link docker/processor/local.sh /local.sh
 COPY --link docker/processor/entrypoint.sh /entrypoint.sh
