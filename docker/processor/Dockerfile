@@ -72,7 +72,7 @@ RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
 FROM base AS jq
 
 COPY docker/processor/build-jq.sh /
-RUN bash /build-jq.sh && rm /build-jq.sh && installpkg /tmp/jq-* && rm -rf /tmp/jq*
+RUN bash /build-jq.sh && rm /build-jq.sh
 
 FROM base AS lambda-tools
 
@@ -88,8 +88,9 @@ FROM base
 COPY --link --from=lambda-tools /usr/local/bin/aws-lambda-rie /usr/local/bin/aws-lambda-rie
 COPY --link --from=lambda-layers /tmp/layer /opt
 COPY --link --from=rust --chmod=0755 /tmp/processor /usr/local/bin/processor
-COPY --link --from=jq --chmod=0755 /usr/bin/jq /usr/bin/jq
-COPY --link --from=jq --chmod=0755 /usr/lib64/libjq* /usr/lib64/
+COPY --link --from=jq --chmod=0755 /tmp/jq* /tmp
+
+RUN installpkg /tmp/jq-* && rm -rf /tmp/jq*
 
 COPY --link docker/processor/local.sh /local.sh
 COPY --link docker/processor/entrypoint.sh /entrypoint.sh
