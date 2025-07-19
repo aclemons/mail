@@ -37,7 +37,7 @@ RUN export TERSE=0 && slackpkg -default_answer=yes -batch=on update && \
     rm -rf /var/cache/packages/* && rm -rf /var/lib/slackpkg/* && \
     c_rehash && update-ca-certificates
 
-ARG GMAIL_OAUTH2_TOOLS_SHA=85c6b4f07e637683cc5e0ec6a66ce8e4397a4b18
+ARG GMAIL_OAUTH2_TOOLS_SHA=0c865b7b590292d5d8a197529127166e9d7d7d2d
 RUN curl -f -o /usr/bin/oauth2.py https://raw.githubusercontent.com/google/gmail-oauth2-tools/$GMAIL_OAUTH2_TOOLS_SHA/python/oauth2.py && chmod 0755 /usr/bin/oauth2.py
 
 
