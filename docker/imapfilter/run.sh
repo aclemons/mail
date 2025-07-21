@@ -36,13 +36,29 @@ printf '%s\n' "$ACCOUNTS" | jq -r 'del(.[0])' | jq -c '.[]' | while read -r acc 
     OTHER_CLIENT_ID="$(printf '%s\n' "$acc" | jq -r '.client_id')"
     OTHER_CLIENT_SECRET="$(printf '%s\n' "$acc" | jq -r '.client_secret')"
 
-    OTHER_ACCESS_TOKEN="$(oauth2.py --quiet --user="$OTHER_USER" --client_id="$OTHER_CLIENT_ID" --client_secret="$OTHER_CLIENT_SECRET" --refresh_token="$OTHER_REFRESH_TOKEN")"
+    if printf '%s\n' "$OTHER_CLIENT_ID" | grep googleusercontent > /dev/null 2>&1 ; then
+      set +e
+      OTHER_ACCESS_TOKEN="$(oauth2.py --quiet --user="$OTHER_USER" --client_id="$OTHER_CLIENT_ID" --client_secret="$OTHER_CLIENT_SECRET" --refresh_token="$OTHER_REFRESH_TOKEN")"
+      acc_ret=$?
+      set -e
+    else
+      set +e
+      OTHER_ACCESS_TOKEN="$(curl -f -s -XPOST https://login.microsoftonline.com/common/oauth2/v2.0/token -d refresh_token="$OTHER_REFRESH_TOKEN" -d grant_type=refresh_token -d client_id="$OTHER_CLIENT_ID" | jq -r '.access_token')"
+      acc_ret=$?
+      set -e
+    fi
+
+    if [ $acc_ret -ne 0 ] ; then
+      printf 'Processing mail for %s failed\n' "$OTHER_IMAP"
+      ret=$acc_ret
+      continue
+    fi
 
     OTHER_OAUTH2="$(oauth2.py --generate_oauth2_string --user="$OTHER_USER" --access_token="$OTHER_ACCESS_TOKEN" | sed -n '$p')"
 
-     printf 'Logging in using oauth2 client %s\n' "$OTHER_CLIENT_ID"
+    printf 'Logging in using oauth2 client %s\n' "$OTHER_CLIENT_ID"
   else
-     printf 'Logging in using password\n'
+    printf 'Logging in using password\n'
     OTHER_PASS="$(printf '%s\n' "$acc" | jq -r '.password')"
   fi
 
