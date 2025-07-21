@@ -39,7 +39,10 @@ printf '%s\n' "$ACCOUNTS" | jq -r 'del(.[0])' | jq -c '.[]' | while read -r acc 
     OTHER_ACCESS_TOKEN="$(oauth2.py --quiet --user="$OTHER_USER" --client_id="$OTHER_CLIENT_ID" --client_secret="$OTHER_CLIENT_SECRET" --refresh_token="$OTHER_REFRESH_TOKEN")"
 
     OTHER_OAUTH2="$(oauth2.py --generate_oauth2_string --user="$OTHER_USER" --access_token="$OTHER_ACCESS_TOKEN" | sed -n '$p')"
+
+     printf 'Logging in using oauth2 client %s\n' "$OTHER_CLIENT_ID"
   else
+     printf 'Logging in using password\n'
     OTHER_PASS="$(printf '%s\n' "$acc" | jq -r '.password')"
   fi
 
