@@ -44,7 +44,7 @@ RUN curl -f -o /usr/bin/oauth2.py https://raw.githubusercontent.com/google/gmail
 FROM base AS lambda-tools
 
 # renovate: datasource=github-releases depName=aws/aws-lambda-runtime-interface-emulator
-ENV AWS_LAMBDA_RIE_VERSION=v1.26
+ENV AWS_LAMBDA_RIE_VERSION=v1.27
 
 WORKDIR /tmp
 RUN \
