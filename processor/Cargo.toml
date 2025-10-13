@@ -7,7 +7,7 @@ edition = "2021"
 imap = "=2.4.1"
 native-tls = "=0.2.14"
 aws-config = "=1.8.8"
-aws-sdk-s3 = "=1.103.0"
+aws-sdk-s3 = "=1.108.0"
 tokio = { version = "=1.47.1", features = ["full"] }
 
 [profile.release]
