@@ -80,6 +80,15 @@
       "matchDepTypes": [
         "required_version"
       ]
+    },
+    {
+      "matchDatasources": [
+        "terraform-provider",
+        "terraform-module"
+      ],
+      "registryUrls": [
+        "https://registry.opentofu.org"
+      ]
     }
   ],
   "pre-commit": {
