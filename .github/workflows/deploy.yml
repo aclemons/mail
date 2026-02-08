@@ -43,7 +43,7 @@ jobs:
         run: echo "DOCKER_IMAGE_VERSION=git$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mail-automation
@@ -106,7 +106,7 @@ jobs:
           tofu_wrapper: false
 
       - name: Configure AWS Credentials (for tofu)
-        uses: aws-actions/configure-aws-credentials@61815dcd50bd041e203e49132bacad1fd04d2708 # v5.1.1
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
         with:
           aws-region: ${{ env.AWS_DEFAULT_REGION }}
           role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/mail-automation
