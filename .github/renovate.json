@@ -21,7 +21,7 @@
         "/^tf/\\.opentofu-version$/"
       ],
       "matchStrings": [
-        "(?<currentValue>.*)"
+        "(?<currentValue>[0-9.]+)"
       ]
     },
     {
@@ -32,7 +32,7 @@
         "/^tf/.*\\.tf$/"
       ],
       "matchStrings": [
-        "required_version\\s=\\s\"(?<currentValue>.*?)\""
+        "required_version\\s*=\\s*\"(?<currentValue>[0-9.]+)\""
       ]
     },
     {
