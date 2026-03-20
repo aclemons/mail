@@ -1,5 +1,5 @@
 
-name: Build and deploy mail infrastructure
+name: CI Checks
 
 on:
   pull_request:
@@ -13,6 +13,7 @@ jobs:
   ci:
     name: Build and test
     runs-on: ubuntu-24.04
+    environment: test
     permissions:
       id-token: write
       contents: read
