@@ -78,10 +78,14 @@ FROM base AS lambda-tools
 
 # renovate: datasource=github-releases depName=aws/aws-lambda-runtime-interface-emulator
 ENV AWS_LAMBDA_RIE_VERSION=v1.33
+ENV AWS_LAMBDA_RIE_SHA=c8a2c1e7063434b613b4636e40b55135db4fc3eb27b2e186b6d9e81fffc742f4daa1615cd7f0fbf8f24b710a6dec492008da14ebc53cc7954a6ac37ce64686fd
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 WORKDIR /tmp
 RUN \
     curl -o /usr/local/bin/aws-lambda-rie -L "https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/download/$AWS_LAMBDA_RIE_VERSION/aws-lambda-rie-x86_64" && \
+    printf "%s  /usr/local/bin/aws-lambda-rie\n" "$RIE_SHA" | sha512sum -c - && \
     chown root:root /usr/local/bin/aws-lambda-rie && chmod 0755 /usr/local/bin/aws-lambda-rie
 
 FROM base

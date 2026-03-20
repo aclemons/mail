@@ -41,3 +41,9 @@ repos:
         args:
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
           - --hook-config=--delegate-chdir
+
+# will enable soon.
+# - repo: https://github.com/zizmorcore/zizmor-pre-commit
+#   rev: v1.23.1
+#   hooks:
+#     - id: zizmor
