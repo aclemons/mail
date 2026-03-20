@@ -14,9 +14,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  docker:
-    name: Apply tofu
+  deploy:
+    name: Deploy to AWS
     runs-on: ubuntu-24.04
+    environment: aws
     permissions:
       id-token: write
       contents: read
