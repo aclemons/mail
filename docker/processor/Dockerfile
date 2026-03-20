@@ -78,7 +78,7 @@ FROM base AS lambda-tools
 
 # renovate: datasource=github-releases depName=aws/aws-lambda-runtime-interface-emulator
 ENV AWS_LAMBDA_RIE_VERSION=v1.34
-ENV AWS_LAMBDA_RIE_SHA=c8a2c1e7063434b613b4636e40b55135db4fc3eb27b2e186b6d9e81fffc742f4daa1615cd7f0fbf8f24b710a6dec492008da14ebc53cc7954a6ac37ce64686fd
+ENV AWS_LAMBDA_RIE_SHA=4fe09c00c74470d5ff54a9ebfeee88c1594c2a8c12c39ed4c763f069efc05b785247481931ca4a8edf30bcf1081e37543f736e3d93fd0648ebf5d08da2b1082b
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
