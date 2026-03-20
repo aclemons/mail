@@ -1,7 +1,9 @@
 
 name: Build and deploy mail infrastructure
 
-on: [pull_request]
+on:
+  pull_request:
+  workflow_dispatch:
 
 env:
   AWS_DEFAULT_REGION: eu-central-1
