@@ -85,7 +85,7 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 WORKDIR /tmp
 RUN \
     curl -o /usr/local/bin/aws-lambda-rie -L "https://github.com/aws/aws-lambda-runtime-interface-emulator/releases/download/$AWS_LAMBDA_RIE_VERSION/aws-lambda-rie-x86_64" && \
-    printf "%s  /usr/local/bin/aws-lambda-rie\n" "$RIE_SHA" | sha512sum -c - && \
+    printf "%s\t/usr/local/bin/aws-lambda-rie\n" "$AWS_LAMBDA_RIE_SHA" | sha512sum -c - && \
     chown root:root /usr/local/bin/aws-lambda-rie && chmod 0755 /usr/local/bin/aws-lambda-rie
 
 FROM base
