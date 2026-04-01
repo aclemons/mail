@@ -33,14 +33,16 @@ repos:
     hooks:
       - id: actionlint-docker
 
-  - repo: https://github.com/tofuutils/pre-commit-opentofu
-    rev: 10864545ddc58bd96330029b6bff16da3d072237 # frozen: v2.2.2
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: d0e12caebb2ab0ee8bf98181c8bfe9702bca103d # frozen: v1.105.0
     hooks:
-      - id: tofu_fmt
-      - id: tofu_tflint
+      - id: terraform_fmt
+        args:
+          - --hook-config=--tf-path=tofu
+      - id: terraform_tflint
         args:
           - --args=--config=__GIT_WORKING_DIR__/.tflint.hcl
-          - --hook-config=--delegate-chdir
+          - --hook-config=--delegate-chdir --tf-path=tofu
 
 # will enable soon.
 # - repo: https://github.com/zizmorcore/zizmor-pre-commit
