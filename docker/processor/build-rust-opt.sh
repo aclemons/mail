@@ -41,10 +41,18 @@ export PKGTYPE=txz
   # shellcheck source=/dev/null
   . rust-opt.info
 
-  # shellcheck disable=SC2154
-  wget "$DOWNLOAD_x86_64"
-  # shellcheck disable=SC2154
-  printf "%s\t%s\n" "$MD5SUM_x86_64" "$(basename "$DOWNLOAD_x86_64")" | md5sum --check --quiet
+  read -ra DOWNLOAD_x86_64 <<< "$DOWNLOAD_x86_64"
+  read -ra MD5SUM_x86_64 <<< "$MD5SUM_x86_64"
+
+  for i in "${!DOWNLOAD_x86_64[@]}"; do
+    url="${DOWNLOAD_x86_64[$i]}"
+    md5="${MD5SUM_x86_64[$i]}"
+    filename="$(basename "$url")"
+
+    wget "$url"
+    printf "%s\t%s\n" "$md5" "$filename" | md5sum --check --quiet
+  done
+
   bash rust-opt.SlackBuild
 )
 
