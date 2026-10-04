@@ -77,6 +77,46 @@ resource "aws_ecr_repository" "imapfilter" {
   }
 }
 
+data "aws_iam_policy_document" "lambda_ecr_access" {
+  for_each = {
+    imapfilter = "${local.project_name}-imapfilter"
+    processor  = "${local.project_name}-processor"
+  }
+
+  statement {
+    sid    = "LambdaECRImageRetrievalPolicy"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+
+    actions = [
+      "ecr:BatchGetImage",
+      "ecr:GetDownloadUrlForLayer",
+    ]
+
+    condition {
+      test     = "ArnLike"
+      variable = "aws:SourceArn"
+      values = [
+        "arn:aws:lambda:${data.aws_region.current.region}:${data.aws_caller_identity.current.account_id}:function:${each.value}",
+      ]
+    }
+  }
+}
+
+resource "aws_ecr_repository_policy" "lambda_ecr_access" {
+  for_each = {
+    imapfilter = aws_ecr_repository.imapfilter.name
+    processor  = aws_ecr_repository.processor.name
+  }
+
+  repository = each.value
+  policy     = data.aws_iam_policy_document.lambda_ecr_access[each.key].json
+}
+
 resource "aws_ecr_lifecycle_policy" "imapfilter" {
   repository = aws_ecr_repository.imapfilter.name
 
@@ -139,16 +179,39 @@ resource "aws_iam_policy" "lambda_ssm_policy" {
           "ssm:GetParameter",
         ]
         Resource = [
-          "arn:aws:ssm:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:parameter/${local.project_name}*"
+          aws_ssm_parameter.accounts_data.arn
         ]
       },
     ]
   })
 }
 
+resource "aws_iam_policy" "processor_ssm_policy" {
+  name        = "${local.project_name}-processor-ssm-policy"
+  description = "Allow ${local.project_name}-processor to read its IMAP credentials."
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter",
+        ]
+        Resource = [
+          aws_ssm_parameter.processor_imap_host.arn,
+          aws_ssm_parameter.processor_imap_user.arn,
+          aws_ssm_parameter.processor_imap_pass.arn,
+        ]
+      }
+    ]
+  })
+}
+
 resource "aws_iam_role" "iam_for_imapfilter_lambda" {
-  name               = "mail-imapfilter-lambda-role"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  name                 = "mail-imapfilter-lambda-role"
+  assume_role_policy   = data.aws_iam_policy_document.assume_role.json
+  permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.project_name}-lambda-permissions-boundary"
 }
 
 resource "aws_iam_role_policy_attachment" "imapfilter_lambda_basic_execution_role" {
@@ -187,6 +250,7 @@ resource "aws_lambda_function" "imapfilter_lambda" {
 
   depends_on = [
     aws_cloudwatch_log_group.imapfilter_lambda,
+    aws_ecr_repository_policy.lambda_ecr_access["imapfilter"],
   ]
 }
 
@@ -271,8 +335,9 @@ EOF
 }
 
 resource "aws_iam_role" "iam_for_processor_lambda" {
-  name               = "mail-processor-lambda-role"
-  assume_role_policy = data.aws_iam_policy_document.assume_role.json
+  name                 = "mail-processor-lambda-role"
+  assume_role_policy   = data.aws_iam_policy_document.assume_role.json
+  permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.project_name}-lambda-permissions-boundary"
 }
 
 resource "aws_iam_role_policy_attachment" "processor_lambda_basic_execution_role" {
@@ -286,8 +351,12 @@ resource "aws_iam_role_policy_attachment" "processor_lambda_insights_execution_r
 }
 
 resource "aws_iam_role_policy_attachment" "processor_ssm" {
-  policy_arn = aws_iam_policy.lambda_ssm_policy.arn
+  policy_arn = aws_iam_policy.processor_ssm_policy.arn
   role       = aws_iam_role.iam_for_processor_lambda.id
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_cloudwatch_log_group" "processor_lambda" {
@@ -311,6 +380,7 @@ resource "aws_lambda_function" "processor_lambda" {
 
   depends_on = [
     aws_cloudwatch_log_group.processor_lambda,
+    aws_ecr_repository_policy.lambda_ecr_access["processor"],
   ]
 
   environment {
@@ -438,7 +508,8 @@ resource "aws_lambda_permission" "processor_eventbridge" {
 }
 
 resource "aws_iam_user" "smtp_user" {
-  name = "mail-ses-smtp-user.20240715-205419"
+  name                 = "mail-ses-smtp-user.20240715-205419"
+  permissions_boundary = "arn:aws:iam::${data.aws_caller_identity.current.account_id}:policy/${local.project_name}-smtp-permissions-boundary"
 }
 
 data "aws_iam_policy_document" "ses_send" {
