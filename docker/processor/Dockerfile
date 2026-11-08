@@ -77,7 +77,7 @@ RUN bash /build-jq.sh && rm /build-jq.sh
 FROM base AS lambda-tools
 
 # renovate: datasource=github-releases depName=aws/aws-lambda-runtime-interface-emulator
-ENV AWS_LAMBDA_RIE_VERSION=v1.37
+ENV AWS_LAMBDA_RIE_VERSION=v1.38
 ENV AWS_LAMBDA_RIE_SHA=4537b7f41512e363abf4cbbfddf1d81c463d5839df9c2be2b112c3e9910ce1dc5a5d89db73c9ecfe7bb3211501a51cbbaf3ba51597027be9a20f97b8978a2859
 
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
