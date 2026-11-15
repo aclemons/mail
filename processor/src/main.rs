@@ -21,7 +21,7 @@ fn build_imap() -> Session<TlsStream<std::net::TcpStream>> {
 
 async fn s3_client() -> Client {
     let region_provider = RegionProviderChain::default_provider();
-    let config = aws_config::defaults(aws_config::BehaviorVersion::v2025_01_17())
+    let config = aws_config::defaults(aws_config::BehaviorVersion::v2026_11_10())
         .region(region_provider)
         .load()
         .await;
